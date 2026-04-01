@@ -7,7 +7,8 @@ const firefoxDir = path.join(distDir, "firefox");
 const chromiumDir = path.join(distDir, "chromium");
 
 const copyTargets = [
-  "src"
+  "src",
+  "assets"
 ];
 
 build();
