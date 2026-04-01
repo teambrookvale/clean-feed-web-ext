@@ -28,6 +28,7 @@
         "src/shared/filter-core.js",
         "src/shared/discovery-rules.js",
         "src/shared/storage.js",
+        "src/shared/remote-rules-core.js",
         "src/shared/remote-rules.js",
         "src/content/index.js"
       ],

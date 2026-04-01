@@ -1,14 +1,25 @@
 (() => {
   const { LOCAL_DISCOVERY_RULES } = globalThis.LinkedInAIFilterDiscoveryRules;
   const { getInstallationId } = globalThis.LinkedInAIFilterStorage;
+  const {
+    base64ToBytes,
+    canonicalStringify,
+    createAppliedDiagnostics,
+    createFallbackDiagnostics,
+    createFetchAttemptDiagnostics,
+    createInitialDiagnostics,
+    createRolloutIneligibleDiagnostics,
+    isRolloutEligible,
+    stripRemoteSignature,
+    validateLocalShape,
+    validateRemoteRules
+  } = globalThis.LinkedInAIFilterRemoteRulesCore;
 
   const RULES_STORAGE_KEY = "activeDiscoveryRules";
   const LAST_GOOD_REMOTE_RULES_KEY = "lastKnownGoodRemoteRules";
   const RULES_DIAGNOSTICS_KEY = "rulesDiagnostics";
   const RULES_REFRESH_TTL_MS = 6 * 60 * 60 * 1000;
   const REMOTE_RULES_URL = "https://linkedin-ai-feed-filter-rules.r2.dev/discovery-rules.json";
-  const ROLLOUT_CHANNEL = "stable";
-  const SUPPORTED_SCHEMA_VERSION = 1;
 
   const PUBLIC_KEY_JWK = {
     crv: "P-256",
@@ -34,12 +45,7 @@
 
   async function refreshRemoteRules({ manual }) {
     const currentDiagnostics = await getRulesDiagnostics();
-    const nextDiagnostics = {
-      ...currentDiagnostics,
-      last_fetch_attempt_at: Date.now(),
-      last_error: null,
-      remote_url: REMOTE_RULES_URL
-    };
+    const nextDiagnostics = createFetchAttemptDiagnostics(currentDiagnostics, REMOTE_RULES_URL, Date.now());
 
     await saveRulesDiagnostics(nextDiagnostics);
 
@@ -53,17 +59,12 @@
       }
 
       const candidateRules = await response.json();
-      await validateRemoteRules(candidateRules);
+      await validateRemoteRules(candidateRules, verifySignature);
 
-      const eligible = await isRolloutEligible(candidateRules.rollout);
+      const eligible = await isRolloutEligibleForInstallation(candidateRules.rollout);
 
       if (!eligible) {
-        await saveRulesDiagnostics({
-          ...nextDiagnostics,
-          active_source: currentDiagnostics.active_source,
-          active_version: currentDiagnostics.active_version,
-          last_error: "Remote rules fetched but not enabled for this rollout bucket."
-        });
+        await saveRulesDiagnostics(createRolloutIneligibleDiagnostics(currentDiagnostics, nextDiagnostics));
         return { applied: false, activeRules: await getStoredActiveRules() };
       }
 
@@ -72,13 +73,7 @@
         [LAST_GOOD_REMOTE_RULES_KEY]: stripRemoteSignature(candidateRules)
       });
 
-      await saveRulesDiagnostics({
-        ...nextDiagnostics,
-        active_source: "remote",
-        active_version: candidateRules.rules_version,
-        last_successful_refresh_at: Date.now(),
-        last_error: null
-      });
+      await saveRulesDiagnostics(createAppliedDiagnostics(nextDiagnostics, candidateRules.rules_version, Date.now()));
 
       return {
         applied: true,
@@ -90,12 +85,9 @@
         [RULES_STORAGE_KEY]: fallbackRules
       });
 
-      await saveRulesDiagnostics({
-        ...nextDiagnostics,
-        active_source: fallbackRules.rules_version === LOCAL_DISCOVERY_RULES.rules_version ? "packaged" : "cached_remote",
-        active_version: fallbackRules.rules_version,
-        last_error: error.message
-      });
+      await saveRulesDiagnostics(
+        createFallbackDiagnostics(nextDiagnostics, fallbackRules, LOCAL_DISCOVERY_RULES.rules_version, error.message)
+      );
 
       return {
         applied: false,
@@ -134,14 +126,7 @@
       return stored[RULES_DIAGNOSTICS_KEY];
     }
 
-    const initialDiagnostics = {
-      active_source: "packaged",
-      active_version: LOCAL_DISCOVERY_RULES.rules_version,
-      last_fetch_attempt_at: 0,
-      last_successful_refresh_at: 0,
-      last_error: null,
-      remote_url: REMOTE_RULES_URL
-    };
+    const initialDiagnostics = createInitialDiagnostics(LOCAL_DISCOVERY_RULES.rules_version, REMOTE_RULES_URL);
 
     await saveRulesDiagnostics(initialDiagnostics);
     return initialDiagnostics;
@@ -159,58 +144,14 @@
       return;
     }
 
-    await saveRulesDiagnostics({
-      active_source: rules.rules_version === LOCAL_DISCOVERY_RULES.rules_version ? "packaged" : "cached_remote",
-      active_version: rules.rules_version,
-      last_fetch_attempt_at: 0,
-      last_successful_refresh_at: 0,
-      last_error: null,
-      remote_url: REMOTE_RULES_URL
-    });
-  }
-
-  async function validateRemoteRules(rules) {
-    if (!rules || typeof rules !== "object") {
-      throw new Error("Rules payload is not an object.");
-    }
-
-    if (!rules.signature || typeof rules.signature !== "string") {
-      throw new Error("Rules payload is missing a signature.");
-    }
-
-    if (rules.schema_version !== SUPPORTED_SCHEMA_VERSION) {
-      throw new Error(`Unsupported rules schema version: ${rules.schema_version}`);
-    }
-
-    validateLocalShape(stripRemoteSignature(rules), true);
-
-    const verified = await verifySignature(rules);
-    if (!verified) {
-      throw new Error("Rules signature verification failed.");
-    }
-  }
-
-  function validateLocalShape(rules, throwOnFailure = false) {
-    const valid = Boolean(
-      rules &&
-      typeof rules === "object" &&
-      typeof rules.rules_version === "string" &&
-      Array.isArray(rules.discovery_rules?.post_selectors) &&
-      rules.discovery_rules.post_selectors.every(isNonEmptyString) &&
-      Array.isArray(rules.extraction_rules?.text_selectors) &&
-      rules.extraction_rules.text_selectors.every(isNonEmptyString)
+    await saveRulesDiagnostics(
+      createFallbackDiagnostics(
+        createInitialDiagnostics(LOCAL_DISCOVERY_RULES.rules_version, REMOTE_RULES_URL),
+        rules,
+        LOCAL_DISCOVERY_RULES.rules_version,
+        null
+      )
     );
-
-    if (!valid && throwOnFailure) {
-      throw new Error("Rules payload failed schema validation.");
-    }
-
-    return valid;
-  }
-
-  function stripRemoteSignature(rules) {
-    const { signature, ...unsignedRules } = rules;
-    return unsignedRules;
   }
 
   async function verifySignature(rules) {
@@ -240,54 +181,9 @@
     );
   }
 
-  async function isRolloutEligible(rollout) {
-    if (!rollout || rollout.channel !== ROLLOUT_CHANNEL) {
-      return false;
-    }
-
-    const percentage = Number(rollout.percentage);
-    if (!Number.isFinite(percentage) || percentage <= 0) {
-      return false;
-    }
-
-    if (percentage >= 100) {
-      return true;
-    }
-
+  async function isRolloutEligibleForInstallation(rollout) {
     const installationId = await getInstallationId();
-    const bucket = stableBucket(installationId);
-    return bucket < percentage;
-  }
-
-  function stableBucket(value) {
-    let hash = 0;
-    for (let index = 0; index < value.length; index += 1) {
-      hash = ((hash << 5) - hash + value.charCodeAt(index)) | 0;
-    }
-    return Math.abs(hash) % 100;
-  }
-
-  function canonicalStringify(value) {
-    if (Array.isArray(value)) {
-      return `[${value.map(canonicalStringify).join(",")}]`;
-    }
-
-    if (value && typeof value === "object") {
-      return `{${Object.keys(value).sort().map((key) => `${JSON.stringify(key)}:${canonicalStringify(value[key])}`).join(",")}}`;
-    }
-
-    return JSON.stringify(value);
-  }
-
-  function base64ToBytes(base64) {
-    const normalized = base64.replace(/-/g, "+").replace(/_/g, "/");
-    const padding = normalized.length % 4 === 0 ? "" : "=".repeat(4 - (normalized.length % 4));
-    const binary = atob(`${normalized}${padding}`);
-    return Uint8Array.from(binary, (character) => character.charCodeAt(0));
-  }
-
-  function isNonEmptyString(value) {
-    return typeof value === "string" && value.trim().length > 0;
+    return isRolloutEligible(rollout, installationId);
   }
 
   globalThis.LinkedInAIFilterRemoteRules = {
