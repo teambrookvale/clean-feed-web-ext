@@ -25,6 +25,7 @@
       ],
       "js": [
         "src/shared/default-patterns.js",
+        "src/shared/filter-core.js",
         "src/shared/discovery-rules.js",
         "src/shared/storage.js",
         "src/shared/remote-rules.js",

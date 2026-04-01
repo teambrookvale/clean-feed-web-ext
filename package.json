@@ -5,6 +5,7 @@
   "description": "Cross-browser build and packaging scripts for the LinkedIn AI Feed Filter extension.",
   "scripts": {
     "build": "node scripts/build.mjs",
-    "package": "node scripts/package.mjs"
+    "package": "node scripts/package.mjs",
+    "test": "node --test tests/*.test.js"
   }
 }

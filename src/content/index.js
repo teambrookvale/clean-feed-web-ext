@@ -1,4 +1,10 @@
 (() => {
+  const {
+    createCompiledSettings,
+    discoverPosts,
+    extractPostText,
+    matchesConfiguredRules
+  } = globalThis.LinkedInAIFilterCore;
   const { getSettings } = globalThis.LinkedInAIFilterStorage;
   const { initializeRules } = globalThis.LinkedInAIFilterRemoteRules;
 
@@ -52,28 +58,6 @@
     compiledSettings = createCompiledSettings(await getSettings());
   }
 
-  function createCompiledSettings(settings) {
-    const flags = settings.caseSensitive ? "" : "i";
-
-    return {
-      ...settings,
-      regexRules: compileRegexList(settings.regexRules, flags),
-      keywordRules: settings.keywordRules.map((rule) => settings.caseSensitive ? rule : rule.toLowerCase()),
-      excludeRules: compileRegexList(settings.excludeRules, flags)
-    };
-  }
-
-  function compileRegexList(patterns, flags) {
-    return patterns.flatMap((pattern) => {
-      try {
-        return [new RegExp(pattern, flags)];
-      } catch (error) {
-        console.warn("Ignoring invalid regex pattern:", pattern, error);
-        return [];
-      }
-    });
-  }
-
   function startObserver() {
     if (observer) {
       observer.disconnect();
@@ -113,13 +97,7 @@
   }
 
   function scanDocument() {
-    const selector = getPostSelector();
-
-    if (!selector) {
-      return;
-    }
-
-    document.querySelectorAll(selector).forEach((post) => processPost(post));
+    discoverPosts(document, activeRules).forEach((post) => processPost(post));
   }
 
   function processPost(post) {
@@ -130,8 +108,8 @@
       return;
     }
 
-    const text = extractPostText(post);
-    const matched = text.length > 0 && matchesConfiguredRules(text);
+    const text = extractPostText(post, activeRules);
+    const matched = text.length > 0 && matchesConfiguredRules(text, compiledSettings);
 
     if (!matched) {
       clearPostState(post);
@@ -144,46 +122,6 @@
     }
 
     highlightPost(post);
-  }
-
-  function matchesConfiguredRules(text) {
-    if (matchesExcludeRules(text)) {
-      return false;
-    }
-
-    return matchesRegexRules(text) || matchesKeywordRules(text);
-  }
-
-  function matchesExcludeRules(text) {
-    return compiledSettings.excludeRules.some((pattern) => pattern.test(text));
-  }
-
-  function matchesRegexRules(text) {
-    return compiledSettings.regexRules.some((pattern) => pattern.test(text));
-  }
-
-  function matchesKeywordRules(text) {
-    if (compiledSettings.keywordRules.length === 0) {
-      return false;
-    }
-
-    const haystack = compiledSettings.caseSensitive ? text : text.toLowerCase();
-    return compiledSettings.keywordRules.some((keyword) => haystack.includes(keyword));
-  }
-
-  function extractPostText(post) {
-    const selector = getTextSelector();
-    const textNodes = selector ? post.querySelectorAll(selector) : [];
-
-    if (textNodes.length === 0) {
-      return (post.innerText || "").trim();
-    }
-
-    return Array.from(textNodes)
-      .map((node) => node.textContent || "")
-      .join(" ")
-      .replace(/\s+/g, " ")
-      .trim();
   }
 
   function highlightPost(post) {
@@ -278,9 +216,5 @@
 
   function getPostSelector() {
     return activeRules?.discovery_rules?.post_selectors?.join(", ") || "";
-  }
-
-  function getTextSelector() {
-    return activeRules?.extraction_rules?.text_selectors?.join(", ") || "";
   }
 })();
