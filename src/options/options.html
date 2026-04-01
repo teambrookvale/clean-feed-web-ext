@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>LinkedIn AI Feed Filter Settings</title>
+    <link rel="stylesheet" href="options.css">
+  </head>
+  <body>
+    <main class="settings">
+      <header class="hero">
+        <p class="eyebrow">Settings</p>
+        <h1>LinkedIn AI Feed Filter</h1>
+        <p class="intro">
+          Control how LinkedIn feed posts are matched, hidden, and excluded without editing extension files.
+        </p>
+      </header>
+
+      <section class="card">
+        <h2>Filtering</h2>
+        <div class="field checkbox">
+          <label for="enabled">Enable filtering</label>
+          <input id="enabled" type="checkbox">
+        </div>
+
+        <div class="field">
+          <label for="mode">Mode</label>
+          <select id="mode">
+            <option value="highlight">Highlight matches</option>
+            <option value="hide">Hide matches</option>
+          </select>
+        </div>
+
+        <div class="field checkbox">
+          <label for="case-sensitive">Case sensitive matching</label>
+          <input id="case-sensitive" type="checkbox">
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>Rules</h2>
+        <div class="field">
+          <label for="regex-rules">Regex rules</label>
+          <p class="hint">One regular expression per line.</p>
+          <textarea id="regex-rules" spellcheck="false"></textarea>
+        </div>
+
+        <div class="field">
+          <label for="keyword-rules">Keyword rules</label>
+          <p class="hint">One plain-text keyword or phrase per line.</p>
+          <textarea id="keyword-rules" spellcheck="false"></textarea>
+        </div>
+
+        <div class="field">
+          <label for="exclude-rules">Exclusion regex rules</label>
+          <p class="hint">Matched posts are skipped if any exclusion regex matches.</p>
+          <textarea id="exclude-rules" spellcheck="false"></textarea>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="section-header">
+          <h2>Discovery Rules</h2>
+          <button id="refresh-rules" type="button" class="secondary small">Refresh</button>
+        </div>
+        <dl class="diagnostics">
+          <div>
+            <dt>Source</dt>
+            <dd id="rules-source">packaged</dd>
+          </div>
+          <div>
+            <dt>Version</dt>
+            <dd id="rules-version">local</dd>
+          </div>
+          <div>
+            <dt>Last success</dt>
+            <dd id="rules-success">Never</dd>
+          </div>
+          <div>
+            <dt>Last error</dt>
+            <dd id="rules-error">None</dd>
+          </div>
+        </dl>
+      </section>
+
+      <section class="card">
+        <h2>Import and Export</h2>
+        <p class="hint">Export your current settings as JSON or import a previously exported file.</p>
+        <div class="actions">
+          <button id="save" type="button">Save settings</button>
+          <button id="reset" type="button" class="secondary">Reset defaults</button>
+          <button id="export-settings" type="button" class="secondary">Export</button>
+          <button id="import-settings" type="button" class="secondary">Import</button>
+        </div>
+        <input id="import-file" type="file" accept="application/json" hidden>
+      </section>
+
+      <p id="status" class="status" aria-live="polite"></p>
+    </main>
+
+    <script src="../shared/default-patterns.js"></script>
+    <script src="../shared/discovery-rules.js"></script>
+    <script src="../shared/storage.js"></script>
+    <script src="../shared/remote-rules.js"></script>
+    <script src="options.js"></script>
+  </body>
+</html>

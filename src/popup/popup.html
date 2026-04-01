@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>LinkedIn AI Feed Filter</title>
+    <link rel="stylesheet" href="popup.css">
+  </head>
+  <body>
+    <main class="popup">
+      <p class="eyebrow">Quick Controls</p>
+      <h1>LinkedIn AI Feed Filter</h1>
+      <p class="summary" id="summary">Loading settings…</p>
+
+      <label class="toggle" for="enabled">
+        <span>Enable filtering</span>
+        <input id="enabled" type="checkbox">
+      </label>
+
+      <div class="panel">
+        <div class="row">
+          <span>Mode</span>
+          <strong id="mode">highlight</strong>
+        </div>
+        <div class="row">
+          <span>Regex rules</span>
+          <strong id="regex-count">0</strong>
+        </div>
+        <div class="row">
+          <span>Keywords</span>
+          <strong id="keyword-count">0</strong>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button id="open-settings" type="button">Open settings</button>
+      </div>
+
+      <p id="status" class="status" aria-live="polite"></p>
+    </main>
+
+    <script src="../shared/default-patterns.js"></script>
+    <script src="../shared/storage.js"></script>
+    <script src="popup.js"></script>
+  </body>
+</html>

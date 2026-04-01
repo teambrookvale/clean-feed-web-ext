@@ -1,0 +1,10 @@
+{
+  "name": "linkedin-ai-feed-filter",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Cross-browser build and packaging scripts for the LinkedIn AI Feed Filter extension.",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "package": "node scripts/package.mjs"
+  }
+}

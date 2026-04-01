@@ -1,0 +1,81 @@
+body {
+  margin: 0;
+  background: linear-gradient(180deg, #faf2de 0%, #f2e3bd 100%);
+  color: #21180b;
+  font: 14px/1.4 "Trebuchet MS", "Segoe UI", sans-serif;
+}
+
+.popup {
+  width: 320px;
+  padding: 16px;
+}
+
+.eyebrow {
+  margin: 0 0 8px;
+  color: #835d00;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+h1 {
+  margin: 0;
+  font: 700 20px/1.05 Georgia, "Iowan Old Style", "Palatino Linotype", serif;
+}
+
+.summary {
+  margin: 10px 0 14px;
+  color: #5f4c22;
+}
+
+.toggle,
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.toggle {
+  margin-bottom: 12px;
+  font-weight: 700;
+}
+
+input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  accent-color: #8d6500;
+}
+
+.panel {
+  padding: 12px;
+  border: 1px solid #d9c393;
+  border-radius: 14px;
+  background: rgba(255, 249, 234, 0.88);
+}
+
+.row + .row {
+  margin-top: 8px;
+}
+
+button {
+  border: 0;
+  border-radius: 999px;
+  padding: 10px 14px;
+  background: #8d6500;
+  color: #fffaf0;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.actions {
+  margin-top: 14px;
+}
+
+.status {
+  min-height: 20px;
+  margin: 10px 0 0;
+  color: #5f4c22;
+}

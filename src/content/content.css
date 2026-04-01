@@ -1,0 +1,41 @@
+.linkedin-ai-feed-filter-match {
+  background: #fff59d !important;
+  box-shadow: inset 0 0 0 2px #f2c94c !important;
+  border-radius: 12px !important;
+}
+
+.linkedin-ai-feed-filter-hidden {
+  display: none !important;
+}
+
+.linkedin-ai-feed-filter-badge {
+  display: inline-block;
+  margin: 8px 8px 0;
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: #7a5d00;
+  color: #fffdf0;
+  font: 600 12px/1.2 Helvetica, Arial, sans-serif;
+  letter-spacing: 0.02em;
+}
+
+.linkedin-ai-feed-filter-placeholder {
+  margin: 8px 0;
+  padding: 12px 14px;
+  border: 1px solid #d2c39a;
+  border-radius: 12px;
+  background: #fff7df;
+  color: #4d3d14;
+  font: 600 13px/1.4 Helvetica, Arial, sans-serif;
+}
+
+.linkedin-ai-feed-filter-placeholder button {
+  margin-left: 8px;
+  border: 0;
+  border-radius: 999px;
+  padding: 6px 10px;
+  background: #7a5d00;
+  color: #fffdf0;
+  font: inherit;
+  cursor: pointer;
+}
