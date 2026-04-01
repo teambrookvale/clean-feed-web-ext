@@ -182,7 +182,7 @@
 
     placeholder.className = PLACEHOLDER_CLASS;
     placeholder.setAttribute(PLACEHOLDER_ATTR, placeholderId);
-    placeholder.textContent = "Post hidden by LinkedIn AI Feed Filter";
+    placeholder.textContent = "Post hidden by Clean Feed Extension.";
 
     button.type = "button";
     button.textContent = "Undo";
