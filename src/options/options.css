@@ -1,58 +1,102 @@
+:root {
+  color-scheme: light;
+  --tb-bg: #f7f9fb;
+  --tb-bg-soft: #f2f4f6;
+  --tb-bg-strong: #e0e3e5;
+  --tb-surface: #ffffff;
+  --tb-surface-low: #f2f4f6;
+  --tb-surface-high: #e6e8ea;
+  --tb-surface-highest: #e0e3e5;
+  --tb-text: #191c1e;
+  --tb-text-muted: #434656;
+  --tb-text-soft: #747688;
+  --tb-border: #c4c5d9;
+  --tb-border-strong: #747688;
+  --tb-primary: #0040e0;
+  --tb-primary-strong: #2e5bff;
+  --tb-primary-dark: #001356;
+  --tb-shadow: 0 20px 40px rgba(0, 19, 86, 0.08);
+  --tb-sans: Inter, -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+  --tb-headline: "Space Grotesk", "Helvetica Neue", Arial, sans-serif;
+  --tb-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+}
+
 body {
   margin: 0;
   background:
-    radial-gradient(circle at top left, #f8e8c4 0, transparent 28%),
-    linear-gradient(180deg, #f7f0de 0%, #efe3c4 100%);
-  color: #1f1a10;
-  font: 15px/1.5 Georgia, "Iowan Old Style", "Palatino Linotype", serif;
+    radial-gradient(circle at top left, rgba(46, 91, 255, 0.14) 0, transparent 24%),
+    linear-gradient(180deg, var(--tb-bg) 0%, #eef2f8 100%);
+  color: var(--tb-text);
+  font: 15px/1.6 var(--tb-sans);
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background-image: radial-gradient(circle, rgba(116, 118, 136, 0.22) 1px, transparent 1px);
+  background-size: 64px 64px;
+  opacity: 0.16;
+  pointer-events: none;
 }
 
 .settings {
-  max-width: 920px;
+  position: relative;
+  z-index: 1;
+  max-width: 960px;
   margin: 0 auto;
-  padding: 32px 20px 48px;
+  padding: 40px 20px 56px;
 }
 
 .hero {
-  margin-bottom: 24px;
+  max-width: 700px;
+  margin-bottom: 28px;
 }
 
 .eyebrow {
-  margin: 0 0 8px;
-  color: #7a5d00;
-  font: 700 12px/1.2 "Trebuchet MS", "Segoe UI", sans-serif;
-  letter-spacing: 0.14em;
+  margin: 0 0 12px;
+  color: var(--tb-primary);
+  font: 600 11px/1.2 var(--tb-headline);
+  letter-spacing: 0.22em;
   text-transform: uppercase;
 }
 
 h1,
 h2 {
   margin: 0;
-  font-weight: 700;
+  font-family: var(--tb-headline);
+  font-weight: 400;
+  letter-spacing: -0.05em;
 }
 
 h1 {
-  font-size: clamp(32px, 5vw, 46px);
-  line-height: 1.05;
+  font-size: clamp(34px, 5vw, 56px);
+  line-height: 0.95;
 }
 
 h2 {
-  font-size: 22px;
+  font-size: 30px;
+  line-height: 1;
 }
 
 .intro,
 .hint,
 .status {
-  color: #594d33;
+  color: var(--tb-text-muted);
+}
+
+.intro {
+  max-width: 640px;
+  margin-top: 14px;
 }
 
 .card {
-  margin-bottom: 18px;
-  padding: 20px;
-  border: 1px solid #dcc9a0;
-  border-radius: 18px;
-  background: rgba(255, 250, 237, 0.92);
-  box-shadow: 0 18px 40px rgba(101, 78, 18, 0.08);
+  margin-bottom: 20px;
+  padding: 24px;
+  border: 1px solid rgba(196, 197, 217, 0.82);
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: var(--tb-shadow);
+  backdrop-filter: blur(16px);
 }
 
 .section-header {
@@ -63,7 +107,7 @@ h2 {
 }
 
 .field {
-  margin-top: 16px;
+  margin-top: 18px;
 }
 
 .field.checkbox {
@@ -71,11 +115,16 @@ h2 {
   align-items: center;
   justify-content: space-between;
   gap: 16px;
+  padding: 14px 16px;
+  background: var(--tb-bg-soft);
 }
 
 label {
   display: block;
-  font-weight: 700;
+  font-family: var(--tb-headline);
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: -0.02em;
 }
 
 select,
@@ -88,53 +137,64 @@ select,
 textarea {
   width: 100%;
   box-sizing: border-box;
-  margin-top: 6px;
-  padding: 12px 14px;
-  border: 1px solid #cfbe95;
-  border-radius: 12px;
-  background: #fffef8;
-  color: #1f1a10;
+  margin-top: 8px;
+  padding: 14px 16px;
+  border: 1px solid var(--tb-border);
+  background: var(--tb-surface);
+  color: var(--tb-text);
+}
+
+select:focus,
+textarea:focus,
+button:focus-visible {
+  outline: 2px solid rgba(46, 91, 255, 0.35);
+  outline-offset: 2px;
 }
 
 textarea {
-  min-height: 140px;
+  min-height: 148px;
   resize: vertical;
-  font-family: "SFMono-Regular", Menlo, Monaco, Consolas, monospace;
+  font-family: var(--tb-mono);
   font-size: 13px;
+  line-height: 1.6;
 }
 
 input[type="checkbox"] {
   width: 20px;
   height: 20px;
-  accent-color: #8d6500;
+  accent-color: var(--tb-primary);
 }
 
 .actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
-  margin-top: 16px;
+  gap: 12px;
+  margin-top: 18px;
 }
 
 button {
   border: 0;
-  border-radius: 999px;
-  padding: 11px 16px;
-  background: #8d6500;
-  color: #fffaf0;
-  font-family: "Trebuchet MS", "Segoe UI", sans-serif;
-  font-weight: 700;
+  padding: 13px 18px;
+  background: linear-gradient(135deg, var(--tb-primary), var(--tb-primary-strong));
+  color: #ffffff;
+  font-family: var(--tb-headline);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
   cursor: pointer;
+  box-shadow: 0 14px 28px rgba(0, 64, 224, 0.2);
 }
 
 button.secondary {
-  background: #eadcba;
-  color: #3f3111;
+  background: var(--tb-surface-low);
+  color: var(--tb-text);
+  box-shadow: none;
 }
 
 button.small {
-  padding: 8px 12px;
-  font-size: 13px;
+  padding: 10px 14px;
+  font-size: 11px;
 }
 
 button:disabled {
@@ -143,35 +203,46 @@ button:disabled {
 }
 
 .diagnostics {
-  margin: 16px 0 0;
+  margin: 18px 0 0;
 }
 
 .diagnostics div {
   display: grid;
   grid-template-columns: 140px 1fr;
-  gap: 8px;
-  margin-bottom: 8px;
+  gap: 10px;
+  margin-bottom: 10px;
+  padding: 14px 16px;
+  background: var(--tb-bg-soft);
 }
 
 .diagnostics dt {
-  font-weight: 700;
-  color: #594d33;
+  font-family: var(--tb-headline);
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--tb-text-soft);
 }
 
 .diagnostics dd {
   margin: 0;
   word-break: break-word;
+  color: var(--tb-text);
 }
 
 .status {
   min-height: 24px;
-  margin: 20px 0 0;
-  font-weight: 700;
+  margin: 24px 0 0;
+  font-weight: 600;
 }
 
 @media (max-width: 640px) {
   .settings {
-    padding: 24px 14px 40px;
+    padding: 28px 14px 40px;
+  }
+
+  .card {
+    padding: 20px;
   }
 
   .section-header,
@@ -182,6 +253,10 @@ button:disabled {
 
   .diagnostics div {
     grid-template-columns: 1fr;
-    gap: 2px;
+    gap: 4px;
+  }
+
+  .actions button {
+    width: 100%;
   }
 }
