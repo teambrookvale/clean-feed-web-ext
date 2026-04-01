@@ -1,0 +1,42 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test-and-build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Run tests
+        run: npm test
+
+      - name: Build extension bundles
+        run: npm run build
+
+      - name: Upload Firefox bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: firefox-bundle
+          path: dist/firefox
+
+      - name: Upload Chromium bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: chromium-bundle
+          path: dist/chromium

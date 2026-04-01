@@ -1,0 +1,65 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Release tag to publish, for example v0.1.0
+        required: true
+        type: string
+      target:
+        description: Git ref to release from. Defaults to main.
+        required: false
+        default: main
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.target }}
+          fetch-depth: 0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Run tests
+        run: npm test
+
+      - name: Build extension bundles
+        run: npm run build
+
+      - name: Package release archives
+        run: npm run package
+
+      - name: Ensure git tag exists
+        run: |
+          if git rev-parse "${{ inputs.tag }}" >/dev/null 2>&1; then
+            echo "Tag already exists locally"
+          else
+            git tag "${{ inputs.tag }}"
+          fi
+
+      - name: Push git tag
+        run: git push origin "${{ inputs.tag }}"
+
+      - name: Create GitHub release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create "${{ inputs.tag }}" \
+            dist/linkedin-ai-feed-filter-firefox.zip \
+            dist/linkedin-ai-feed-filter-chromium.zip \
+            --verify-tag \
+            --generate-notes
