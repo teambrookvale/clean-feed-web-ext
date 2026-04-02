@@ -7,7 +7,7 @@
 
   const DEFAULT_SETTINGS = Object.freeze({
     enabled: true,
-    mode: "highlight",
+    mode: "hide",
     regexRules: [...DEFAULT_PATTERNS],
     keywordRules: [],
     excludeRules: [],

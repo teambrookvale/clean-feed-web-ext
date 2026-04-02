@@ -19,7 +19,7 @@
 
   let compiledSettings = createCompiledSettings({
     enabled: true,
-    mode: "highlight",
+    mode: "hide",
     regexRules: [],
     keywordRules: [],
     excludeRules: [],
