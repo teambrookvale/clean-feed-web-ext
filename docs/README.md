@@ -1,6 +1,8 @@
-# LinkedIn AI Feed Filter
+# LinkedIn Feed Filter
 
 Cross-browser browser extension PoC that scans the LinkedIn feed, matches posts against regex keywords, and highlights matching posts with a yellow background.
+
+<img width="1280" height="800" alt="LinkedinScreenshot" src="https://github.com/user-attachments/assets/e56e4c51-3fae-41c8-8017-c24e6843e92d" />
 
 ## Features
 
